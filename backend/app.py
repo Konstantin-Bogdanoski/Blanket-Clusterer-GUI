@@ -1,13 +1,14 @@
 # @author Konstantin Bogdanoski (konstantin.b@live.com)
 
 import os
+import tempfile
 
 from flask import Flask, request
 from flask import jsonify, send_file
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = '/mnt/3e5ed6ee-daf0-46ea-a37c-a017faf1ea72/Downloads/flask/'
+UPLOAD_FOLDER = tempfile.gettempdir()
 ALLOWED_EXTENSIONS = {'model', 'pickle', 'vec', 'csv'}
 
 app = Flask(__name__)
