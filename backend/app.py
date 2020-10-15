@@ -8,7 +8,7 @@ from flask import jsonify, send_file
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = tempfile.gettempdir()
+UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), '')
 ALLOWED_EXTENSIONS = {'model', 'pickle', 'vec', 'csv'}
 
 app = Flask(__name__)
