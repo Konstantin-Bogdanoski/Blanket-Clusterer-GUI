@@ -1,4 +1,5 @@
 # Blanket-Clusterer-GUI
+
 ### [EN]
 This repository contains the Python Flask + ReactJS web application, which will allow users
 to easily use Blanket Clusterer python module. 
@@ -13,6 +14,8 @@ For more details, check out the [wiki](https://github.com/Konstantin-Bogdanoski/
 
 ***
 
-Faculty of Computer Science and Engineering, Skopje, North Macedonia, 2020
+#### Faculty of Computer Science and Engineering, Skopje, North Macedonia, 2020
 
-Факултет за Информатички Науки и Компјутерско Инженерство, Скопје, С. Македонија, 2020
+#### Факултет за Информатички Науки и Компјутерско Инженерство, Скопје, С. Македонија, 2020
+
+![ФИНКИ лого](https://finki.ukim.mk/sites/default/files/logo_10.png)
