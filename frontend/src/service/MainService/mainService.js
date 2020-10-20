@@ -26,6 +26,8 @@ const MainService = {
 
     clusterize: (data) => {
         let form = new FormData;
+        form.append("blanketClustererPath", data.blanketClustererPath)
+        form.append("outputPath", data.outputPath)
         form.append("modelType", data.modelType)
         form.append("numClusters", data.numClusters)
         form.append("numItems", data.numItems)

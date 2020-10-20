@@ -9,6 +9,29 @@ const ParametersForm = (props) => {
         <div className="text-center h-100" style={{minHeight: "20em", verticalAlign: "middle"}}>
             <div className="input-group mb-3">
                 <div className="input-group-prepend">
+                                        <span className="input-group-text border-primary bg-white" id="basic-addon1">
+                                            Absolute path to blanket clusterer</span>
+                </div>
+                <input type="text" name="blanketClustererPath"
+                       className="form-control border-info"
+                       placeholder="Absolute path to blanket clusterer (main.py in the module)"
+                       aria-label="BlanketClusterer path"
+                       aria-describedby="basic-addon1" required={true} onChange={props.handleInputChange}
+                       value={props.data.blanketClustererPath != null ? props.data.blanketClustererPath : ""}/>
+            </div>
+            <div className="input-group mb-3">
+                <div className="input-group-prepend">
+                                        <span className="input-group-text border-primary bg-white" id="basic-addon1">
+                                            Absolute path to output file</span>
+                </div>
+                <input type="text" name="outputPath"
+                       className="form-control border-info"
+                       placeholder="Absolute path to output file" aria-label="Output path"
+                       aria-describedby="basic-addon1" required={true} onChange={props.handleInputChange}
+                       value={props.data.outputPath != null ? props.data.outputPath : ""}/>
+            </div>
+            <div className="input-group mb-3">
+                <div className="input-group-prepend">
                                         <span className="input-group-text border-primary bg-white"
                                               id="basic-addon1">Clustering type</span>
                 </div>

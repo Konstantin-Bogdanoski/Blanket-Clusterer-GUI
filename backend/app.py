@@ -124,27 +124,32 @@ def clusterize():
     global names_path
     global group_names_path
     global embeddings_path
-    model_type = request.form["modelType"]
-    num_clusters = request.form["numClusters"]
-    num_items = request.form["numItems"]
-    max_depth = request.form["maximumDepth"]
-    output_path = "../output.json"
 
-    command = "python3 /home/konstantin/Desktop/FCSE/Blanket-Clusterer/script/main.py "
+    blanket_clusterer_path = "\"" + request.form["blanketClustererPath"] + "\" "
+    model_type = "\"" + request.form["modelType"] + "\""
+    num_clusters = "\"" + request.form["numClusters"] + "\""
+    num_items = "\"" + request.form["numItems"] + "\""
+    max_depth = "\"" + request.form["maximumDepth"] + "\""
+    output_path = "\"" + request.form["outputPath"] + "\""
+
+    # \"D:\PERSONAL\Projects\Blanket Clusterer\Python Module\main.py\"
+
+    command = "python " + blanket_clusterer_path
     command += model_type + " " + num_clusters + " " + embeddings_path + " " + names_path + " " + num_items
     command += " " + max_depth + " " + output_path
     if group_names_path is not None:
         command += " " + group_names_path
+
     os.system(command)
 
-    with open("/home/konstantin/Desktop/FCSE/Blanket-Clusterer/output.json", "r") as output_json:
+    with open(request.form["outputPath"], "r") as output_json:
         output = output_json.read()
-    with open("/home/konstantin/Desktop/FCSE/Blanket-Clusterer/backend/visualization/Results.html", "r") as output_html:
+    with open(r"../visualization/Results.html", "r") as output_html:
         op_html = output_html.read()
 
     op_html = op_html.replace("{{{output.json}}}", output)
 
-    output_file = open("/home/konstantin/Desktop/FCSE/Blanket-Clusterer/backend/visualization/Results-Copy.html", "w")
+    output_file = open(r"../visualization/Results-Copy.html", "w")
     output_file.write(op_html)
 
     return "Clustering completed"
@@ -153,7 +158,7 @@ def clusterize():
 @app.route("/rest/output", methods=['GET', 'OPTIONS'])
 @cross_origin()
 def get_output():
-    return send_file("/home/konstantin/Desktop/FCSE/Blanket-Clusterer/backend/visualization/Results-Copy.html",
+    return send_file("../visualization/Results-Copy.html",
                      mimetype="text/html")
 
 

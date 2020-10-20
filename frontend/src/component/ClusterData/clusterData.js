@@ -47,7 +47,10 @@ class ClusterData extends Component {
             "numClusters": this.state.numClusters,
             "numItems": this.state.numItems,
             "maximumDepth": this.state.maximumDepth,
+            "blanketClustererPath": this.state.blanketClustererPath,
+            "outputPath": this.state.outputPath
         }
+
         let model = this.state.model;
         let names = this.state.names;
         let groupNames = this.state.groupNames;
@@ -154,7 +157,9 @@ class ClusterData extends Component {
             "modelType": this.state.modelType,
             "numClusters": this.state.numClusters,
             "numItems": this.state.numItems,
-            "maximumDepth": this.state.maximumDepth
+            "maximumDepth": this.state.maximumDepth,
+            "blanketClustererPath": this.state.blanketClustererPath,
+            "outputPath": this.state.outputPath
         }
     }
 

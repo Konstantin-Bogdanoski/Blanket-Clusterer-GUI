@@ -24,6 +24,8 @@ class App extends Component {
             "numClusters": null,
             "numItems": null,
             "maximumDepth": null,
+            "blanketClustererPath": null,
+            "outputPath": null
         }
     }
 
@@ -33,6 +35,8 @@ class App extends Component {
             "numClusters": null,
             "numItems": null,
             "maximumDepth": null,
+            "blanketClustererPath": null,
+            "outputPath": null
         })
     }
 
