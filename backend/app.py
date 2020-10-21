@@ -165,10 +165,9 @@ def get_output():
 @app.route("/<path:path>", methods=['GET', 'OPTIONS'])
 @cross_origin()
 def get_js(path):
-    print(path)
-    if "foamtree" in path:
-        return send_file(request.path)
-    return
+    if "js" in path or "css" in path:
+        return send_file("../visualization/" + request.path.replace("rest/", ""))
+    return send_file("../visualization" + request.path)
 
 
 # Error handlers

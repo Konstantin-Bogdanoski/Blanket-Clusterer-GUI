@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Clustering results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+    <meta property="og:image" content="//get.carrotsearch.com/foamtree/latest/demos/assets/img/main-thumbnail.jpg"/>
+
+    <meta charset="utf-8"/>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"
+          rel="stylesheet"/>
+    <link href="css/common.css"
+          rel="stylesheet"/>
+
+    <!-- Include FoamTree visualization code -->
+    <script src="js/carrotsearch.foamtree.js"></script>
+
+    <!-- Include the tree model utilities -->
+    <script src="js/carrotsearch.foamtree.util.treemodel.js"></script>
+
+    <!-- Utilities, optional -->
+    <script src="js/jquery/jquery.jsonp.min.js"></script>
+    <script src="js/carrotsearch.template.js"></script>
+    <script src="js/jquery/jquery.min.js"></script>
+
+</head>
+
+<body>
+<div id="container" style="width: 100%">
+    <div id="visualization"></div>
+</div>
+
+<div id="side" style="display: none">
+    <section style="display: none">
+        <h4>Data sets:</h4>
+        <div id="datasets"></div>
+    </section>
+
+    <div id="ui" style="display: none">
+        <section>
+            <h4>Go directly to:</h4>
+            <div id="direct"></div>
+        </section>
+        <hr/>
+        <section>
+            <h4>Data set statistics:</h4>
+            <div id="stats"></div>
+        </section>
+        <hr/>
+        <section>
+            <h4>Research done by</h4>
+            <div><strong><a href="https://www.linkedin.com/in/konstantin-bogdanoski/">Konstantin Bogdanoski</a></strong>
+                - konstantin.b@live.com
+            </div>
+            <div><strong><a href="https://www.linkedin.com/in/kostadin-mishev-b6574a68/">MSc Kostadin
+                Mishev</a></strong> - kostadin.mishev@finki.ukim.mk
+            </div>
+            <div><strong><a href="https://www.linkedin.com/in/dimitartrajanov/">PhD Dimitar Trajanov</a></strong> -
+                dimitar.trajanov@finki.ukim.mk
+            </div>
+            <hr/>
+            <h5><strong><a href="https://www.finki.ukim.mk">Faculty of Computer Science and Engineering</a></strong>
+                <br/>Skopje, North Macedonia</h5>
+        </section>
+    </div>
+    <section id="loading">Loading data...</section>
+</div>
+
+<script>
+    window.addEventListener("load", function () {
+        // We'll need to track the last group the user zoomed to.
+        let lastZoomedTo = undefined;
+
+        // Initialize FoamTree
+        let foamtree = new CarrotSearchFoamTree({
+            id: "visualization",
+            pixelRatio: window.devicePixelRatio || 1,
+
+            // Disable rollout and pullback animations, use simple fading
+            rolloutDuration: 0,
+            pullbackDuration: 0,
+            fadeDuration: 0,
+            groupFillType: "plain",
+            groupStrokePlainLightnessShift: -20,
+
+            // Increase the relaxation quality threshold a little for
+            // faster processing at the cost of slightly lower layout quality.
+            relaxationQualityThreshold: 6,
+
+            // Sometimes, an alternative layout may produce better results.
+            // relaxationInitializer: "treemap",
+
+            // This listener processes the input data before display.
+            onModelChanging: function (dataObject) {
+                CarrotSearchFoamTree.TreeModel.eachDescendantAndSelf(dataObject, function (group, index, parent, level) {
+                    // If no label, use the id as the label
+                    if (!group.label) {
+                        group.label = group.id + "";
+                    }
+
+                    if (group.weight) {
+                        // Take the square root of the weight to flatten-out the
+                        // distribution of weights. If the range of the original
+                        // weights is very large, such flattening will improve the
+                        // layout, but still preserve the relationships between
+                        // group weight and polygon size.
+                        // You may also experiment with some other power, such us 0.5.
+                        group.weight = Math.pow(group.weight, 0.25);
+                    }
+                });
+            },
+
+            groupColorDecorator: function (opts, params, vars) {
+                // We'll vari the colors a little between flattened and hierarchical views
+                let flattened = opts.stacking === "flattened";
+                let coverage = params.group.coverage;
+                if (coverage !== undefined && coverage >= 0) {
+                    // Coverage defined. 0% coverage will be red,
+                    // 100% coverage will be green.
+                    vars.groupColor.h = 120 * coverage / 100.0;
+                    vars.groupColor.s = 70;
+                    vars.groupColor.l = flattened ? 60 : 50;
+                } else {
+                    // Coverage not defined, draw the group in grey.
+                    vars.groupColor.s = 0;
+                    vars.groupColor.l = 75;
+                }
+
+                if (flattened && params.level === 0) {
+                    vars.groupColor.l = 95;
+                }
+            },
+
+            // Remove restriction on the minimum group diameter, so that
+            // we can render as many diagram levels as possible.
+            groupMinDiameter: 0,
+
+            // Lower the minimum label font size a bit to show more labels.
+            groupLabelMinFontSize: 3,
+
+            // Lower the parent group opacity, so that lower-level groups show through.
+            parentFillOpacity: 0.5,
+
+            // Always draw group labels, this will make zooming more attractive.
+            wireframeLabelDrawing: "always",
+
+            // You can change how many levels of polygons and labels below
+            // each topmost closed group FoamTree will draw. Lower values will
+            // result in faster rendering, but also less detail "underneath" the closed groups.
+            maxGroupLevelsDrawn: 4,
+            maxGroupLabelLevelsDrawn: 3,
+            // Disable "expose" on double click, it will not work well on very deeply nested groups.
+            // Instead, open the group and zoom into it.
+            onGroupDoubleClick: function (e) {
+                e.preventDefault();
+                let group = e.secondary ? e.bottommostOpenGroup : e.topmostClosedGroup;
+                let toZoom;
+                if (group) {
+                    // Open on left-click, close on right-click
+                    this.open({groups: group, open: !e.secondary});
+                    toZoom = e.secondary ? group.parent : group;
+                } else {
+                    toZoom = this.get("dataObject");
+                }
+                this.zoom(toZoom);
+                lastZoomedTo = toZoom;
+            },
+
+            groupLabelDecorator: function (opts, params, vars) {
+                if (params.hasChildren && params.browseable === false) {
+                    vars.labelText += " [+]";
+                }
+            },
+
+            onKeyUp: function (event) {
+                if (event.keyCode === 27 && lastZoomedTo !== undefined) {
+                    event.preventDefault();
+                    foamtree.set("zoomMouseWheelEasing", "squareInOut");
+                    foamtree.set("zoomMouseWheelDuration", Math.max(2000, lastZoomedTo.level * 25));
+                    this.zoom(this.get("dataObject")).then(this.reset);
+                    foamtree.set("zoomMouseWheelDuration", CarrotSearchFoamTree.defaults.zoomMouseWheelDuration);
+                    foamtree.set("zoomMouseWheelEasing", CarrotSearchFoamTree.defaults.zoomMouseWheelEasing);
+                    lastZoomedTo = undefined;
+                }
+            },
+
+            onViewReset: function () {
+                lastZoomedTo = undefined;
+            }
+        });
+
+        window.addEventListener("orientationchange", foamtree.resize);
+
+        window.addEventListener("resize", (function () {
+            let timeout;
+            return function () {
+                window.clearTimeout(timeout);
+                timeout = window.setTimeout(foamtree.resize, 300);
+            }
+        })());
+
+        initDatasets([
+            {url: 'assets/data/tree-of-life.js', label: "Tree of Life, 70k+ groups"},
+            {url: 'assets/data/metazoa.js', label: "Metazoa (animals), 100k+ groups"}
+        ]);
+
+        $("body")
+            .on("click", "a.dataset", function (e) {
+                e.preventDefault();
+                loadDataSet(this.href);
+            })
+            .on("click", "a[href = '#zoom-out']", function (e) {
+                e.preventDefault();
+                zoomToGroup(foamtree.get("dataObject"));
+            })
+            .on("click", "a.go", function (e) {
+                e.preventDefault();
+                let id = this.hash.substring(1);
+                let group = CarrotSearchFoamTree.TreeModel.findFirstByProperty(foamtree.get("dataObject"), "id", id);
+                if (group) {
+                    zoomToGroup(group);
+                }
+            });
+
+        $("a.dataset:eq(0)").trigger("click");
+
+        function initDatasets(datasets) {
+            let template = Template.make("<a href='<%- url %>' class='dataset'><%- label %></a>");
+
+            $("#datasets").html(datasets.reduce(function (html, ds) {
+                html += template(ds);
+                return html;
+            }, ""));
+        }
+
+        function loadDataSet(dataSetUrl) {
+            let $loading = $("#loading").show();
+            let $ui = $("#ui").hide();
+            let dataObject = {{{output.json}}}
+
+            prepareDirectLinks(dataObject, ["Clusters"]);
+
+            $loading.hide();
+            $ui.show();
+            lastZoomedTo = undefined;
+
+            setTimeout(function () {
+                foamtree.set("dataObject", dataObject);
+            }, 100);
+        }
+
+        function prepareDirectLinks(dataObject, byName) {
+            let count = 0, numLeafGroups = 0, numNonLeafGroups = 0, maxChildren = 0;
+            CarrotSearchFoamTree.TreeModel.eachDescendantAndSelf(dataObject, function (group, index, parent, level) {
+                if (group.id === undefined) {
+                    group.id = count;
+                }
+                group.parent = parent;
+                group.level = level;
+                group.children = group.groups ? group.groups.length : 0;
+
+                if (maxChildren < group.children) {
+                    maxChildren = group.children;
+                }
+                count++;
+                if (group.children > 0) {
+                    numNonLeafGroups++;
+                } else {
+                    numLeafGroups++;
+                }
+            });
+
+            let html = "";
+            $("#direct").html(html);
+        }
+
+        function zoomToGroup(target) {
+            if (target === lastZoomedTo) {
+                return;
+            }
+
+            if (!lastZoomedTo) {
+                lastZoomedTo = foamtree.get("dataObject");
+            }
+
+            let common = lowestCommonAncestor(lastZoomedTo, target);
+            let targetParents = allParents(target);
+            targetParents.pop();
+
+            foamtree.open(targetParents).then(function () {
+                while (target.parent && !foamtree.get("state", target.parent).browseable) {
+                    target = target.parent;
+                }
+
+                foamtree.set("zoomMouseWheelEasing", "squareInOut");
+                foamtree.set("zoomMouseWheelDuration", Math.max(2000, (lastZoomedTo.level - common.level) * 50));
+                foamtree.zoom(common).then(function () {
+                    // Open all parents of the target group.
+                    foamtree.open({groups: target, open: false});
+                    foamtree.set("zoomMouseWheelDuration", Math.max(2000, (target.level - common.level) * 100));
+
+                    // Zoom to the target group.
+                    foamtree.zoom(target);
+                    foamtree.set("zoomMouseWheelDuration", CarrotSearchFoamTree.defaults.zoomMouseWheelDuration);
+                    foamtree.set("zoomMouseWheelEasing", CarrotSearchFoamTree.defaults.zoomMouseWheelEasing);
+                });
+                lastZoomedTo = target;
+            });
+        }
+
+        function lowestCommonAncestor(groupA, groupB) {
+            let parentsA = allParents(groupA);
+            let parentsB = allParents(groupB);
+
+            let max = Math.min(parentsA.length, parentsB.length);
+            for (let i = 0; i < max; i++) {
+                if (parentsA[i] !== parentsB[i]) {
+                    return parentsA[i - 1];
+                }
+            }
+
+            return parentsA[max - 1];
+        }
+
+        function allParents(group) {
+            let parents = [];
+            let parent = group;
+            while (parent) {
+                parents.push(parent);
+                parent = parent.parent;
+            }
+            parents.reverse();
+            return parents;
+        }
+    });
+</script>
+</body>
+</html>
