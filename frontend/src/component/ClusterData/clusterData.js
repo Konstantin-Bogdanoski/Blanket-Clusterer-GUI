@@ -28,6 +28,7 @@ class ClusterData extends Component {
     }
 
     handleInputChange = (e) => {
+        debugger;
         e.preventDefault();
         let key = e.target.name;
         let value = e.target.value;
