@@ -7,6 +7,7 @@ from flask import Flask, request
 from flask import jsonify, send_file
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
+from backend.exceptions import *
 
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), '')
 ALLOWED_EXTENSIONS = {'model', 'pickle', 'vec', 'csv'}
@@ -18,41 +19,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 embeddings_path = None
 group_names_path = None
 names_path = None
-
-
-# Exceptions
-
-
-class InvalidUsage(Exception):
-    status_code = 400
-
-    def __init__(self, message, status_code=None, payload=None):
-        Exception.__init__(self)
-        self.message = message
-        if status_code is not None:
-            self.status_code = status_code
-        self.payload = payload
-
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv['message'] = self.message
-        return rv
-
-
-class NoFileFound(Exception):
-    status_code = 404
-
-    def __init__(self, message, status_code=None, payload=None):
-        Exception.__init__(self)
-        self.message = message
-        if status_code is not None:
-            self.status_code = status_code
-        self.payload = payload
-
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv['message'] = self.message
-        return rv
 
 
 def allowed_file(filename):
@@ -125,14 +91,20 @@ def clusterize():
     global group_names_path
     global embeddings_path
 
+    if embeddings_path == "" or embeddings_path is None:
+        raise NoFileFound("File with names could not be found", status_code=404)
+
+    if names_path == "" or names_path is None:
+        raise NoFileFound("File with names could not be found", status_code=404)
+
+    validate_payload(request)
+
     blanket_clusterer_path = "\"" + request.form["blanketClustererPath"] + "\" "
     model_type = "\"" + request.form["modelType"] + "\""
     num_clusters = "\"" + request.form["numClusters"] + "\""
     num_items = "\"" + request.form["numItems"] + "\""
     max_depth = "\"" + request.form["maximumDepth"] + "\""
     output_path = "\"" + request.form["outputPath"] + "\""
-
-    # \"D:\PERSONAL\Projects\Blanket Clusterer\Python Module\main.py\"
 
     command = "python " + blanket_clusterer_path
     command += model_type + " " + num_clusters + " " + embeddings_path + " " + names_path + " " + num_items
@@ -153,6 +125,27 @@ def clusterize():
     output_file.write(op_html)
 
     return "Clustering completed"
+
+
+def validate_payload(request):
+    if request.form["blanketClustererPath"] == "" or request.form["blanketClustererPath"] is None:
+        raise NoFileFound("Absolute path to blanket clusterer is not provided", status_code=404)
+
+    if request.form["modelType"] == "" or request.form["modelType"] is None:
+        raise NoFileFound("Clustering type is not provided", status_code=404)
+
+    if request.form["numClusters"] == "" or request.form["numClusters"] is None:
+        raise NoFileFound("Number of clusters is not provided", status_code=404)
+
+    if request.form["numItems"] == "" or request.form["numItems"] is None:
+        raise NoFileFound("Number of items in cluster is not provided", status_code=404)
+
+    if request.form["maximumDepth"] == "" or request.form["maximumDepth"] is None:
+        raise NoFileFound("Maximum depth is not provided", status_code=404)
+
+    if request.form["outputPath"] == "" or request.form["outputPath"] is None:
+        raise NoFileFound("Absolute path to output file is not provided", status_code=404)
+    return True
 
 
 @app.route("/rest/output", methods=['GET', 'OPTIONS'])
