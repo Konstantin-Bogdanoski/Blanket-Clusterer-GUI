@@ -25,7 +25,10 @@ class Header extends Component {
                             <div className="text-right h-100">
                                 <div style={{height: "0.3em"}}>&nbsp;</div>
                                 <span style={{verticalAlign: "middle"}}>
-                                    <a href={"#"} className="btn btn-outline-primary btn-default text-white-50"
+                                    <a href={"https://konstantin-bogdanoski.github.io/Blanket-Clusterer-Docs/#/"}
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       className="btn btn-outline-primary btn-default text-white-50"
                                        style={{verticalAlign: "middle", display: "inline"}}>
                                         Docs
                                     </a>
