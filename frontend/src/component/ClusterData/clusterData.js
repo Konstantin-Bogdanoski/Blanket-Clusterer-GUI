@@ -20,7 +20,7 @@ class ClusterData extends Component {
         this.setState({
             "waitResponse": false,
             "errorMsg": null,
-            "model": null,
+            "embeddings": null,
             "names": null,
             "groupNames": null,
             "successful": null
@@ -28,7 +28,6 @@ class ClusterData extends Component {
     }
 
     handleInputChange = (e) => {
-        debugger;
         e.preventDefault();
         let key = e.target.name;
         let value = e.target.value;
@@ -52,17 +51,17 @@ class ClusterData extends Component {
             "outputPath": this.state.outputPath
         }
 
-        let model = this.state.model;
+        let embeddings = this.state.embeddings;
         let names = this.state.names;
         let groupNames = this.state.groupNames;
 
-        let sessionModel = sessionStorage.getItem("model");
+        let sessionEmbeddings = sessionStorage.getItem("embeddings");
         let sessionNames = sessionStorage.getItem("names");
         let sessionGroupNames = sessionStorage.getItem("groupNames");
 
-        if (sessionModel === null && sessionNames === null && sessionGroupNames === null) {
-            MainService.uploadModel(model).then(resp => {
-                sessionStorage.setItem("model", model.name);
+        if (sessionEmbeddings === null && sessionNames === null && sessionGroupNames === null) {
+            MainService.uploadModel(embeddings).then(resp => {
+                sessionStorage.setItem("embeddings", embeddings.name);
                 MainService.uploadNames(names).then(resp => {
                     sessionStorage.setItem("names", names.name);
                     if (groupNames !== null && groupNames !== undefined && groupNames !== "undefined") {
@@ -117,7 +116,7 @@ class ClusterData extends Component {
     onModelChangeHandler = (e) => {
         e.preventDefault();
         this.setState({
-            "model": e.target.files[0]
+            "embeddings": e.target.files[0]
         });
     };
 
@@ -143,7 +142,7 @@ class ClusterData extends Component {
     }
 
     dataReady = () => {
-        if ((this.state.model == null && sessionStorage.getItem("model") === null) ||
+        if ((this.state.embeddings == null && sessionStorage.getItem("embeddings") === null) ||
             (this.state.names == null && sessionStorage.getItem("names") === null))
             return false;
         for (let entry in this.state.data) {
@@ -182,11 +181,11 @@ class ClusterData extends Component {
                         </Col>
                     </Row>
                     <br/>
-                    {sessionStorage.getItem("model") !== null &&
+                    {sessionStorage.getItem("embeddings") !== null &&
                     sessionStorage.getItem("names") !== null ?
                         <div className="text-sm-center">
                             <div className="text-secondary">
-                                You already have an uploaded model and a names file
+                                You already have uploaded your embeddings and a names file
                             </div>
                             <div className="text-info">
                                 If you'd like to upload new ones, click&nbsp;
@@ -203,17 +202,19 @@ class ClusterData extends Component {
                             </Col>
                             <Col xs={8}>
                                 <form onSubmit={this.onFormSubmit}>
-                                    {this.state.model == null && sessionStorage.getItem("model") === null ? <div>
-                                        <EmbeddingsForm onModelChangeHandler={this.onModelChangeHandler}/>
-                                    </div> : this.state.names == null && sessionStorage.getItem("names") === null ?
+                                    {this.state.embeddings == null && sessionStorage.getItem("embeddings") === null ?
                                         <div>
-                                            <NamesForm onNamesChangeHandler={this.onNamesChangeHandler}/>
-                                        </div> : this.state.groupNames == null && sessionStorage.getItem("groupNames") === null ?
+                                            <EmbeddingsForm onModelChangeHandler={this.onModelChangeHandler}/>
+                                        </div> : this.state.names == null && sessionStorage.getItem("names") === null ?
                                             <div>
-                                                <GroupNamesForm onGroupChangeHandler={this.onGroupNamesChangeHandler}/>
-                                            </div> : <div>
-                                                <ParametersForm handleInputChange={this.handleInputChange}
-                                                                data={this.getData()}/>
+                                                <NamesForm onNamesChangeHandler={this.onNamesChangeHandler}/>
+                                            </div> : this.state.groupNames == null && sessionStorage.getItem("groupNames") === null ?
+                                                <div>
+                                                    <GroupNamesForm
+                                                        onGroupChangeHandler={this.onGroupNamesChangeHandler}/>
+                                                </div> : <div>
+                                                    <ParametersForm handleInputChange={this.handleInputChange}
+                                                                    data={this.getData()}/>
                                             </div>}
                                     <hr/>
                                     <div className="input-group-btn text-center">
@@ -230,7 +231,7 @@ class ClusterData extends Component {
                                                 </Col>
                                                 <Col>
                                                     <div className="text-right">
-                                                        {this.state.model != null && this.state.names != null && this.state.groupNames == null ?
+                                                        {this.state.embeddings != null && this.state.names != null && this.state.groupNames == null ?
                                                             <button className="btn btn-outline-info"
                                                                     onClick={this.skipGroupNames} type="button">Skip
                                                             </button> : <span/>}

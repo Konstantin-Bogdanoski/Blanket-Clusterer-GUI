@@ -36,7 +36,8 @@ class Home extends Component {
                                 implementation of different clustering algorithms in the background, allowing you as
                                 well as other
                                 data scientists to not implement it themselves, rather quickly look at the results their
-                                model provided them. The output this generates is a <code>JSON</code> file, compatible
+                                model provided them. The output this model generates is a <code>JSON</code> file,
+                                compatible
                                 with&nbsp;
                                 <a href={"https://carrotsearch.com"} target="_blank">CarrotSearch</a>'s <a
                                 href={"https://carrotsearch.com/foamtree/"} target="_blank">FoamTree</a> interactive
@@ -78,11 +79,12 @@ class Home extends Component {
                             <div>
                                 The clustering calculates the difference mainly using the <strong>Cosine
                                 distance</strong> similarity calculation equation,
-                                but if you need to, you can change the scripts to use other parameters if you'd want to.
+                                but if you need to, you can change the scripts to use other parameters.
                                 Cosine
-                                distance was chosen due to previous research where it was proven that it was better
+                                distance was chosen due to previous research where it has proven that it is better
                                 contrary to&nbsp;
-                                <i>Eucledian distance</i>.
+                                <i>Eucledian distance</i> for calculating distance between vectors, extracted from NLP
+                                tasks.
                             </div>
                         </Col>
                     </Row>
@@ -91,15 +93,49 @@ class Home extends Component {
                         <Col>
                             <div>
                                 <a name="first_requirement"><strong>First</strong></a>, you need to have an
-                                operational Word2Vec model containing
+                                operational model containing
                                 the embeddings from your dataset.
-                                For now, we're only supporting Word2Vec, but be patient, we're working as hard as we
-                                can to implement more models.
+                                Previously we only supported Word2Vec models, but we've updated the code to work
+                                explicitly with vectors, instead of models. Thus, providing a service which works with
+                                all
+                                models, although further formatting of the vectors is required.
                             </div>
                         </Col>
                         <Col>
                             <div className="text-center">
-                                <h1>Word2Vec</h1>
+                                <table className="table table-bordered table-primary">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            key
+                                        </th>
+                                        <th>
+                                            value
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            0001
+                                        </td>
+                                        <td>
+                                            0.01, 0.02, ..., 0.03
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            0002
+                                        </td>
+                                        <td>
+                                            0.04, 0.05, ..., 0.06
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div>
+                                    Example table for the Names
+                                </div>
                             </div>
                         </Col>
                     </Row>
@@ -110,7 +146,7 @@ class Home extends Component {
                             a <code>.csv</code> file, containing
                             your <code>Key-Value</code> pairs regarding
                             the names of the entities. The values of the <code>keys</code> must correspond to the
-                            values of the <code>keys</code> in the vectors of the Word2Vec model<br/>
+                            values of the <code>keys</code> in the vectors of the embeddings file<br/>
                             Take a look at the example table. <br/>
                             <i className="text-secondary"><strong>Note:</strong> Notice the names of the columns, they
                                 must be <code>key</code> and <code>value</code> respectively</i>
@@ -149,42 +185,6 @@ class Home extends Component {
                                 </table>
                                 <div>
                                     Example table for the Names
-                                </div>
-                            </div>
-                            <br/>
-                            <div className="text-center">
-                                <table className="table table-bordered table-primary">
-                                    <thead>
-                                    <tr>
-                                        <th>
-                                            key
-                                        </th>
-                                        <th>
-                                            value
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>
-                                            0001
-                                        </td>
-                                        <td>
-                                            [0.11, 0.22, ..., 0.99]
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            0002
-                                        </td>
-                                        <td>
-                                            [0.12, 0.13, ..., 0.19]
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <div>
-                                    Example table for the Word2Vec embeddings
                                 </div>
                             </div>
                         </Col>
@@ -252,7 +252,7 @@ class Home extends Component {
                     <hr/>
                     <Row>
                         <Col>
-                            An important note is that the key values in your Word2Vec model, must be the same as
+                            An important note is that the key values in your embeddings, must be the same as
                             the <code>key</code> values in your
                             <code>.csv</code> names and/or group-names files.
                         </Col>
@@ -260,7 +260,9 @@ class Home extends Component {
                     <Row>
                         <Col>
                             And that is it. If you have met those requirements, you should be able to use this package
-                            without any issues. For any further information or details visit the <a href={"#"}
+                            without any issues. For any further information or details visit the <a target="_blank"
+                                                                                                    rel="noopener noreferrer"
+                                                                                                    href={"https://konstantin-bogdanoski.github.io/Blanket-Clusterer-Docs/#/"}
                                                                                                     className="btn btn-outline-info">Docs</a> page.
                             You can now head over to <Link to={"/add-data"}
                                                            className="btn btn-outline-primary">Clusterize</Link> to

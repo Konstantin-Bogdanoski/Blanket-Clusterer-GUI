@@ -7,10 +7,11 @@ from flask import Flask, request
 from flask import jsonify, send_file
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
+
 from backend.exceptions import *
 
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), '')
-ALLOWED_EXTENSIONS = {'model', 'pickle', 'vec', 'csv'}
+ALLOWED_EXTENSIONS = {'pkl', 'pickle', 'csv'}
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/rest/*": {"origins": "*"}})
@@ -40,10 +41,10 @@ def after_request(response):
 @cross_origin()
 def upload_group_names():
     if 'file' not in request.files:
-        raise NoFileFound("No group-names file was uploaded", status_code=404)
+        raise NoFileFound("No group-names file was uploaded", status_code=400)
     file = request.files['file']
     if file.filename == '':
-        raise NoFileFound("No file was uploaded", status_code=404)
+        raise NoFileFound("No file was uploaded", status_code=400)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -56,10 +57,10 @@ def upload_group_names():
 @cross_origin()
 def upload_embeddings():
     if 'file' not in request.files:
-        raise NoFileFound("No embeddings file was uploaded", status_code=404)
+        raise NoFileFound("No embeddings file was uploaded", status_code=400)
     file = request.files['file']
     if file.filename == '':
-        raise NoFileFound("No file was uploaded", status_code=404)
+        raise NoFileFound("No file was uploaded", status_code=400)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -72,10 +73,10 @@ def upload_embeddings():
 @cross_origin()
 def upload_names():
     if 'file' not in request.files:
-        raise NoFileFound("No names file was uploaded", status_code=404)
+        raise NoFileFound("No names file was uploaded", status_code=400)
     file = request.files['file']
     if file.filename == '':
-        raise NoFileFound("No file was uploaded", status_code=404)
+        raise NoFileFound("No file was uploaded", status_code=400)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))

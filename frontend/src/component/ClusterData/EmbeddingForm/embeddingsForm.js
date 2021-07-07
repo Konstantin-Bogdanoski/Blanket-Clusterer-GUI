@@ -7,11 +7,11 @@ import React from "react";
 const EmbeddingsForm = (props) => {
     return (
         <div className="text-center h-100 border border-primary" style={{minHeight: "20em", verticalAlign: "middle"}}>
-            <div className="text-monospace">Upload your <strong>Word2Vec</strong> model</div>
+            <div className="text-monospace">Upload your <strong>embeddings</strong></div>
             <input type="file"
                    style={{marginTop: "15%"}}
                    className="text-center text-monospace"
-                   placeholder="Upload your models file"
+                   placeholder="Upload your file with embeddings"
                    onChange={props.onModelChangeHandler}
                    required/>
         </div>
